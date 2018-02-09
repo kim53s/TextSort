@@ -6,21 +6,26 @@ int compare(const void *a, const void *b);
 
 int main(int argc, char **argv){
 
-
-	if(argc > 3 || argc == 1){
+	// if there are no arguments or more than two arguments, exit
+	if( argc == 1 || argc > 3 ){
 		fprintf(stderr, "Error: Bad command line parameters\n");
 		exit(1);
 	}
+	// if there are two arguments
 	else if( argc == 3 ){
 		int num;
 		char *end;
 		num = strtol(argv[2], &end, 10);
+
+		// check the second argument meets the format of a dash followed by a number
 		if(num >= 0 ){
 			fprintf(stderr, "Error: Bad command line parameters\n");
 			exit(1);
 		}
 	}
-		readFile(argv[1]);
+
+	// read the file
+	readFile(argv[1]);
 
 	return 0;
 }
@@ -32,6 +37,7 @@ void readFile(char file[]){
 	f = fopen(file, "rb"); 
 	if(f == NULL){
 		fprintf(stderr, "There is no such file.\n");
+		exit(1)
 	}
 
 	ch = getc(f);
