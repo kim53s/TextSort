@@ -1,5 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+int a;
+int b;
+
 
 void readFile(char file[]);
 int compare(const void *a, const void *b);
@@ -30,13 +35,27 @@ int main(int argc, char **argv){
     return 0;
 }
 
+
+
+void sortString(char *str[a][b]){
+    printf("%s\n", str[0][0]);
+    int i;
+    char words[a];
+    for (i=0;i<=a;i++){
+     words[i] = *str[i][0];
+         //printf("%s\n", words[i]);
+    }
+}
+
+
+
+
 void readFile(char file[]){
     FILE *f;
-    
-    char s1[100];
-    char s2[100];
-    char s3[100];
-    char s4[100];
+
+
+    int i=0;
+
     
     f = fopen(file, "rb");
     if(f == NULL){
@@ -44,17 +63,40 @@ void readFile(char file[]){
         exit(1);
     }
     
-    fgets(s1,100,f);
-    fgets(s2,100,f);
-    fgets(s3,100,f);
-    fgets(s4,100,f);
-
-    printf("%s\n", s1);
-    printf("%s\n", s2);
-    printf("%s\n", s3);
-    printf("%s\n", s4);
+    
+    char input[100][100];
+    
+    char *str[sizeof(input)][sizeof(input[0])];
+    
+    
+    while(fgets(input[i],sizeof(input),f)){
+        input[i][strlen(input[i]) - 1] = '\0';
+        i++;
+    }
+    
+    
+    char * pch;
+    int j;
+    int k;
+    for(k=0; k<sizeof(str); k++){
+        pch = strtok (input[k]," ");
+        j=0;
+        while (pch != NULL)
+        {
+            str[k][j] = pch;
+            //printf("%s\n", str[k][j]);
+            j++;
+            pch = strtok (NULL, " ");
+        }
+        printf("%s\n", str[1][1]);
+    }
+    printf("%s\n", str[1][1]);
+   printf("%s\n", "hello world");
+    sortString(str);
     
     fclose(f);
 }
+
+
 
 
