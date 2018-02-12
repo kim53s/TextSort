@@ -4,6 +4,8 @@
 
 void readFile(char file[]);
 int compare(const void *a, const void *b);
+int maxRow = 5;
+int row = 1;
 
 int main(int argc, char **argv){
 
@@ -46,38 +48,61 @@ void readFile(char file[]){
 
 
 	char **strs;
-    strs = (char**)malloc(sizeof(char*)*3); 
+    strs = (char**)malloc(sizeof(char*)*maxRow); 
+    for(int i = 0; i < maxRow; i++){
+    	strs[i] = (char*)malloc(sizeof(char)*128);    	
+    }
+    //strs[0] = (char*)malloc(sizeof(char)*128);    	
+    //strs[1] = (char*)malloc(sizeof(char)*10);
+    //strs[2] = (char*)malloc(sizeof(char)*6);
 
-    strs[0] = (char*)malloc(sizeof(char)*4);
-    strs[1] = (char*)malloc(sizeof(char)*10);
-    strs[2] = (char*)malloc(sizeof(char)*6);
-
-    int i = 0;
 	ch = getc(f);
 	while (ch != EOF){
 		if(ch != '\n'){
 			char temp[2]; 
 			temp[0] = ch; 
 			temp[1] = '\0';
-			strcat(strs[i], temp);
+			strcat(strs[row-1], temp);
 		}
-		else{
-			i++;		
-			//printf("New Line!\n");
+		else{		
+			row++;
+			
+			// reallocate
+			if(row > maxRow){
+				char** strs2 = (char**)realloc(strs, sizeof(char*)*maxRow*2);
+	
+				// for (int i = 0; i < maxRow; i++){
+				// 	strs2[i] = (char*)realloc(strs[i], sizeof(char)*128);
+				// }
+
+				if(strs2 != NULL){
+					strs = strs2;
+				}
+				else{
+					fprintf(stderr, "Error: Realloc failed.\n");
+					exit(1);
+				}
+
+				for(int i = maxRow; i < maxRow*2; i++){
+					strs[i] = (char*)malloc(sizeof(char)*128);	
+				}
+				
+				maxRow = maxRow*2;		
+				printf("MAX ROW: %d\n", maxRow);	
+			}			
 		}
 		ch = getc(f);
 	}
 
-	for(int i = 0; i < 3; i++){
+	printf("%d\n", row );
+	for(int i = 0; i < row; i++){
 		for(int j = 0; j < strlen(strs[i]); j++){
 			printf("%c", strs[i][j]);
 		}
 		printf("\n");
 	}
-	
-	printf("\n");
 
-	for(int i = 0; i < 3; i++){
+	for(int i = 0; i < maxRow; i++){
 		free(strs[i]);
 	}
 	free(strs);
