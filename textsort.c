@@ -4,10 +4,12 @@
 
 void readFile(char file[]);
 int compare(const void *a, const void *b);
+char* getWord(char *string);
 
-int maxRow = 5;
+int maxRow = 10;
 int row = 1;
 char **strs;
+int wordNum;
 
 int main(int argc, char **argv){
 
@@ -28,13 +30,17 @@ int main(int argc, char **argv){
 			exit(1);
 		}
 		else{
+			wordNum = -num;
 			readFile(argv[2]);
 			return 0;
 		}
 	}
-	else  // there is only one argument
+	else{  // there is only one argument
+		wordNum = 1;
 		readFile(argv[1]); // read the file
+	}
 
+	printf("%d\n", wordNum);
 	return 0;
 }
 
@@ -74,10 +80,6 @@ void readFile(char file[]){
 			// reallocate
 			if(row > maxRow){
 				char** strs2 = (char**)realloc(strs, sizeof(char*)*maxRow*2);
-	
-				// for (int i = 0; i < maxRow; i++){
-				// 	strs2[i] = (char*)realloc(strs[i], sizeof(char)*128);
-				// }
 
 				if(strs2 != NULL){
 					strs = strs2;
@@ -99,8 +101,7 @@ void readFile(char file[]){
 
 	qsort((char *)strs, row, sizeof(strs[0]), compare); 
 
-
-	printf("The number of sentences: %d\n", row );
+	// print out the sorted sentences
 	for(int i = 0; i < row; i++){
 		for(int j = 0; j < strlen(strs[i]); j++){
 			printf("%c", strs[i][j]);
@@ -113,27 +114,54 @@ void readFile(char file[]){
 	}
 	free(strs);
 
-	// size of the file
-	// fseek(f, 0, SEEK_END);    
- //    long fileSize = ftell(f);
- //    fseek(f, 0, SEEK_SET);
- //   printf("%lu\n", fileSize);
-
 	fclose(f);
 }
+
+char* getWord(char *string){
+
+   	const char s[2] = " ";
+   	char *token;
+  	char *former; 
+   	// the first token 
+   	token = strtok(string, s);
+  
+   	for(int i = 0; i < wordNum-1; i++){
+   		former = token;
+   		token = strtok(NULL, s);
+   		if(token == NULL){
+   			return former;
+   		}		
+   	}
+
+   	//printf("TOKEN%s\n", token);
+   	return token;
+}
+
 
 
 int compare(const void *elem1, const void *elem2){
 	// Cast to its actual type.
     char **strptr1 = (char **) elem1;
     char **strptr2 = (char **) elem2;
-    
+   	
     // Dereference to get the strings 
     char *str1 = *strptr1;
     char *str2 = *strptr2;
 
+    char s1[sizeof(char)*strlen(str1)];
+    char s2[sizeof(char)*strlen(str2)];
+
+	for(int i = 0; i < strlen(str1); i++){
+		s1[i] = str1[i]; 
+	}	
+
+	for(int i = 0; i < strlen(str2); i++){
+		s2[i] = str2[i]; 
+	}	
+
+    char *word1 = getWord(s1);
+    char *word2 = getWord(s2);
+
     /* Then use strcmp to compare the strings */
-
-	return strcmp(str1, str2);
+	return strcmp(word1, word2);
 }
-
