@@ -4,8 +4,10 @@
 
 void readFile(char file[]);
 int compare(const void *a, const void *b);
+
 int maxRow = 5;
 int row = 1;
+char **strs;
 
 int main(int argc, char **argv){
 
@@ -42,27 +44,29 @@ void readFile(char file[]){
 
 	f = fopen(file, "rb"); 
 	if(f == NULL){
-		fprintf(stderr, "There is no such file.\n");
+		fprintf(stderr, "Error: Cannot open file %s\n", file);
 		exit(1);
 	}
 
 
-	char **strs;
     strs = (char**)malloc(sizeof(char*)*maxRow); 
     for(int i = 0; i < maxRow; i++){
     	strs[i] = (char*)malloc(sizeof(char)*128);    	
     }
-    //strs[0] = (char*)malloc(sizeof(char)*128);    	
-    //strs[1] = (char*)malloc(sizeof(char)*10);
-    //strs[2] = (char*)malloc(sizeof(char)*6);
 
 	ch = getc(f);
 	while (ch != EOF){
 		if(ch != '\n'){
-			char temp[2]; 
-			temp[0] = ch; 
-			temp[1] = '\0';
-			strcat(strs[row-1], temp);
+			if(strlen(strs[row-1]) < 128){
+				char temp[2]; 
+				temp[0] = ch; 
+				temp[1] = '\0';
+				strcat(strs[row-1], temp);
+			}
+			else{
+				fprintf(stderr, "Line too long\n");
+				exit(1);
+			}
 		}
 		else{		
 			row++;
@@ -79,7 +83,7 @@ void readFile(char file[]){
 					strs = strs2;
 				}
 				else{
-					fprintf(stderr, "Error: Realloc failed.\n");
+					fprintf(stderr, "malloc failed\n");
 					exit(1);
 				}
 
@@ -88,13 +92,15 @@ void readFile(char file[]){
 				}
 				
 				maxRow = maxRow*2;		
-				printf("MAX ROW: %d\n", maxRow);	
 			}			
 		}
 		ch = getc(f);
 	}
 
-	printf("%d\n", row );
+	qsort((char *)strs, row, sizeof(strs[0]), compare); 
+
+
+	printf("The number of sentences: %d\n", row );
 	for(int i = 0; i < row; i++){
 		for(int j = 0; j < strlen(strs[i]); j++){
 			printf("%c", strs[i][j]);
@@ -116,17 +122,18 @@ void readFile(char file[]){
 	fclose(f);
 }
 
-// int compare(const void *a, const void *b){
-// 	/* Cast to its actual type. */
-//     char **strptr1 = (char **) elem1;
-//     char **strptr2 = (char **) elem2;
+
+int compare(const void *elem1, const void *elem2){
+	// Cast to its actual type.
+    char **strptr1 = (char **) elem1;
+    char **strptr2 = (char **) elem2;
     
-//      Dereference to get the strings 
-//     char *str1 = *strptr1;
-//     char *str2 = *strptr2;
+    // Dereference to get the strings 
+    char *str1 = *strptr1;
+    char *str2 = *strptr2;
 
-//     /* Then use strcmp to compare the strings */
+    /* Then use strcmp to compare the strings */
 
-// 	return ( *(char *)a - *(char *)b);
-// }
+	return strcmp(str1, str2);
+}
 
