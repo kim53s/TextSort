@@ -6,6 +6,7 @@
 void readFile(char file[]);
 int compare(const void *a, const void *b);
 char* getWord(char *string);
+int checkInput(char input[]);
 
 int maxRow = 10;
 int row = 1;
