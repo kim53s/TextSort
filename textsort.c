@@ -8,10 +8,14 @@ int compare(const void *a, const void *b);
 char* getWord(char *string);
 int checkInput(char input[]);
 
+// the maximun numer of lines
 int maxRow = 10;
+// the number of lines 
 int row = 1;
+// string array that holds lines in a file
 char **strs;
-int wordNum;
+// nth word is used as the key to sort upon
+int nth;
 
 int main(int argc, char **argv){
 
@@ -25,12 +29,13 @@ int main(int argc, char **argv){
 		int num;
 		char *end;
 
+		// if the first argument is not a digit 
         if (checkInput(argv[1])==1){
             fprintf(stderr, "Error: Bad command line parameters\n");
             exit(1);
         }
         else
-        	num = strtol(argv[1], &end, 10);
+        	num = strtol(argv[1], &end, 10); 
 
 		// check the first argument meets the format of a dash followed by a number
 		if(num >= 0 ){
@@ -38,19 +43,22 @@ int main(int argc, char **argv){
 			exit(1);
 		}
 		else{
-			wordNum = -num;
+			nth = -num;
+
 			readFile(argv[2]);
+			
 			return 0;
 		}
 	}
 	else{  // there is only one argument
-		wordNum = 1;
-		readFile(argv[1]); // read the file
-	}
+		nth = 1;
+		
+		readFile(argv[1]); 
 
 	return 0;
 }
 
+// opens file, reads the lines, and stores them into a string array
 void readFile(char file[]){
 	FILE *f;
 	int ch;
@@ -66,15 +74,20 @@ void readFile(char file[]){
     	strs[i] = (char*)malloc(sizeof(char)*128);    	
     }
 
+    // get a char from the file
 	ch = getc(f);
+	// if it is not the end of the file
 	while (ch != EOF){
 		if(ch != '\n'){
 			if(strlen(strs[row-1]) < 128){
+
 				char temp[2]; 
 				temp[0] = ch; 
 				temp[1] = '\0';
+
 				strcat(strs[row-1], temp);
 			}
+			// when the size of a line is bigger than 128
 			else{
 				fprintf(stderr, "Line too long\n");
 				exit(1);
@@ -83,9 +96,10 @@ void readFile(char file[]){
 		else{
 
 			row++;
-			
-			// reallocate
+
+			// if the current number of lines is bigger than the maximun number of lines
 			if(row > maxRow){
+				// double the size of memory
 				char** strs2 = (char**)realloc(strs, sizeof(char*)*maxRow*2);
 
 				if(strs2 != NULL){
@@ -96,6 +110,7 @@ void readFile(char file[]){
 					exit(1);
 				}
 
+				// the newly allocated part
 				for(int i = maxRow; i < maxRow*2; i++){
 					strs[i] = (char*)malloc(sizeof(char)*128);	
 				}
@@ -123,11 +138,12 @@ void readFile(char file[]){
 	fclose(f);
 }
 
+// get the nth word that is used as the key to sort upon
 char* getWord(char *string){
 
    	const char s[2] = " ";
    	char *token;
-  	char *former; 
+  	char *last; 
 
   	// if the string is empty, then return NULL
   	if(string[0] == '\0')
@@ -140,17 +156,19 @@ char* getWord(char *string){
   	if(token[0] == '\n' || token[0] == '\0')
   		return NULL;
 
-   	for(int i = 0; i < wordNum-1; i++){
-   		former = token;
+   	for(int i = 0; i < nth-1; i++){
+   		last = token;
    		token = strtok(NULL, s);
+   		// if there is no nth word, return the last word
    		if(token == NULL){
-   			return former;
+   			return last;
    		}		
    	}
 
    	return token;
 }
 
+// return 1 if input is not decimal digit
 int checkInput(char input[]){
     int i = 0;
     for (i=1; input[i]!=0; i++){
@@ -174,10 +192,11 @@ int compare(const void *elem1, const void *elem2){
     char s1[sizeof(char)*strlen(str1)+1];
     char s2[sizeof(char)*strlen(str2)+1];
 
+    // copy str1
 	for(int i = 0; i < strlen(str1)+1; i++){
 		s1[i] = str1[i]; 
 	}	
-
+	// copy str2
 	for(int i = 0; i < strlen(str2)+1; i++){
 		s2[i] = str2[i]; 
 	}	
